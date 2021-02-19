@@ -1,0 +1,64 @@
+{
+    "builders": [
+    {
+        "type": "proxmox",
+        "proxmox_url": "https://{{user `proxmox_host`}}/api2/json",
+        "insecure_skip_tls_verify": true,
+        "username": "{{user `proxmox_api_user`}}",
+        "password": "{{user `proxmox_api_password`}}",
+
+        "vm_name": "{{user `template_name`}}",
+        "vm_id": "{{ user `vmid` }}",
+        "node": "{{user `proxmox_node_name`}}",
+        "cores": "{{ user `cores` }}",
+        "sockets": "{{ user `sockets` }}",
+        "memory": "{{ user `memory` }}",
+        "os": "l26",
+        "network_adapters": [
+            {
+                "model": "virtio",
+                "bridge": "vmbr0"
+            }
+        ],
+        "disks": [
+            {
+                "type": "scsi",
+                "disk_size": "{{ user `disk_size`}}",
+                "storage_pool": "{{user `datastore`}}",
+                "storage_pool_type": "{{user `datastore_type`}}",
+                "format": "raw",
+                "cache_mode": "writeback"
+            }
+        ],
+
+        "ssh_timeout": "90m",
+        "ssh_username": "{{ user `ssh_username` }}",
+        "ssh_password": "{{ user `ssh_password` }}",
+        "ssh_pty": true,
+        "ssh_handshake_attempts": "20",
+
+        "qemu_agent": true,
+        "unmount_iso": true,
+
+        "iso_url": "{{ user `iso_url` }}",
+        "iso_checksum": "{{ user `iso_checksum` }}",
+        "iso_storage_pool": "{{ user `iso_storage_pool` }}",
+        "http_directory": "./http",
+        "template_description": "{{ user `template_description` }}",
+
+        "boot_wait": "10s",
+        "boot_command": [
+            "<enter><enter><f6><esc><wait> ",
+            "autoinstall ds=nocloud-net;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
+            "<enter><wait>"
+        ]
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": ["ls /"]
+    }
+  ]
+}
